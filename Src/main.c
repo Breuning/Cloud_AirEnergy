@@ -79,7 +79,6 @@ int main(void)
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
-  
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -104,14 +103,14 @@ int main(void)
   MX_USART3_UART_Init();
   MX_TIM5_Init();
   MX_TIM2_Init();
-//  MX_IWDG_Init();
+  MX_IWDG_Init();
   MX_TIM3_Init();
   MX_RTC_Init();
   /* USER CODE BEGIN 2 */
 
   My_RTC_Init();
 
-//  HAL_IWDG_Init(&hiwdg);                //初始化并开启iwdg
+  HAL_IWDG_Init(&hiwdg);                //初始化并开启iwdg
   HAL_TIM_Base_Start_IT(&htim3);        //使能定时器3中断，1s进入一次，
   HAL_TIM_Base_Start_IT(&htim5);        //使能定时器5中断，5s进入一次，控制读取传感器数值频率
 
@@ -138,7 +137,7 @@ int main(void)
 	RS485_Task();
 	NBiot_Task();
 
-//	HAL_IWDG_Refresh(&hiwdg);     //喂狗，即重新加载计数值
+	HAL_IWDG_Refresh(&hiwdg);     //喂狗，即重新加载计数值
   }
   /* USER CODE END 3 */
 }
@@ -192,6 +191,13 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
+/*软件复位*/
+void McuReset(void)
+{
+//	__disable_fault_irq();
+    __set_FAULTMASK(1);           // 关闭所有中断
+    HAL_NVIC_SystemReset();
+}
 
 /* USER CODE END 4 */
 

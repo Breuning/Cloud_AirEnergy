@@ -11,6 +11,8 @@
 #include "main.h"
 #include "stm32f1xx_hal.h"
 
+#define TickCount_UploadFaild 15*60*1000
+
 extern uint8_t NBiotIMEI[16];
 
 extern BOOL NETWORK_RegisteredFlag;
@@ -21,6 +23,7 @@ extern const char *ATCmds[];
 
 extern void NBiot_Task();
 extern void NBiot_Init();
+extern void NBiot_POWD_PEN();
 
 extern void NBiot_ATSend(const char *cmd);
 

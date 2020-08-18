@@ -7,6 +7,7 @@
 
 #include "main.h"
 
+#include "iwdg.h"
 #include "NBiotTask.h"
 #include "usart.h"
 #include "Package.h"
@@ -14,7 +15,7 @@
 
 #include "string.h"
 
-//static void NBiot_POWD_PEN();               //硬件关闭模组电源
+
 //static uint8_t NBiot_ATAck(const char *str);
 //static void NBiot_QMTPUBEX();
 //static void NBiot_QMTOPEN();
@@ -43,6 +44,9 @@ uint8_t ATCmds_QMTCONN[100] = { 0 };
 BOOL NETWORK_RegisteredFlag = FALSE;
 
 BOOL NBiotTaskTimerFlag = FALSE;
+
+uint32_t Tick_UploadSucess = 0;
+uint32_t Tick_EveryTask = 0;
 
 const char *ATCmds[] =
 {
@@ -164,6 +168,15 @@ void NBiot_Task()
 			NBiot_QMTOPENCONN();
 //			NBiot_QMTSUB();
 		}
+
+
+		Tick_EveryTask = HAL_GetTick();
+		if((Tick_EveryTask - Tick_UploadSucess) > TickCount_UploadFaild)
+		{
+			NBiot_POWD_PEN();
+			HAL_Delay(200);
+			McuReset();
+		}
 	}
 }
 
@@ -200,10 +213,10 @@ void NBiot_QMTPUB()
 {
 	char *temp1 = ">";
 //	char *temp2 = "+QMTPUB: 0,0,0";
+	char *temp2 = "0,0,0";
 
 	uint8_t sub[] = {0x1A,0x1B};         //发送的数据包后面加CTRL+Z和ESC
 
-	PackageComposition();
 
 	cmdAT_QMTPUB:
 	NBiot_ATSend(ATCmds[AT_QMTPUB]);
@@ -215,14 +228,25 @@ void NBiot_QMTPUB()
 		memset(NBUart_RX.RX_Buf, 0 , sizeof(NBUart_RX.RX_Buf));
 	}
 
+
+	PackageComposition();
 	strcat((char *)CloudPackage, (const char *)sub);
+
 	NBiot_ATSend((char *)CloudPackage);
+	HAL_Delay(1000);
+	if(NBUart_RX.receive_flag)
+	{
+		NBUart_RX.receive_flag = 0;
+		if(strstr((const char *)NBUart_RX.RX_Buf, temp2) != NULL)
+		{
+			Tick_UploadSucess = HAL_GetTick();
+			LED2_NETWORK_DataTransfer();    //每发布一包数据网络指示灯快速闪烁多次
+		}
+		memset(NBUart_RX.RX_Buf, 0 , sizeof(NBUart_RX.RX_Buf));
+	}
+
 	memset(CloudPackage, 0 , sizeof(CloudPackage));
 
-	HAL_Delay(1000);
-	NBiot_CleanRXBuf();
-
-	LED2_NETWORK_DataTransfer();    //每发布一包数据网络指示灯快速闪烁2次
 }
 
 void NBiot_Reset()
@@ -259,6 +283,7 @@ void NBiot_NetworkRegis()
 
 	do
 	{
+		HAL_IWDG_Refresh(&hiwdg);
 		HAL_Delay(1000);
 		NBiot_ATSend(ATCmds[AT_CREGTEST]);
 		if(NBUart_RX.receive_flag)
@@ -332,7 +357,11 @@ void Get_ATQMTCONN()
 	strcat((char *)ATCmds_QMTCONN, (const char *)temp2);
 }
 
-
+/*硬件关闭模组电源*/
+void NBiot_POWD_PEN()
+{
+	HAL_GPIO_WritePin(NB_PWRKEY_GPIO_Port, NB_PWRKEY_Pin, GPIO_PIN_SET);
+}
 
 
 

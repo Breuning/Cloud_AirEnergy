@@ -29,8 +29,8 @@ RTC_HandleTypeDef hrtc;
 /* RTC init function */
 void MX_RTC_Init(void)
 {
-//  RTC_TimeTypeDef sTime = {0};
-//  RTC_DateTypeDef DateToUpdate = {0};
+  RTC_TimeTypeDef sTime = {0};
+  RTC_DateTypeDef DateToUpdate = {0};
 
   /** Initialize RTC Only 
   */
@@ -50,7 +50,6 @@ void MX_RTC_Init(void)
 
   /** Initialize RTC and set the Time and Date 
   */
-/*
   sTime.Hours = 0x13;
   sTime.Minutes = 0x40;
   sTime.Seconds = 0x0;
@@ -68,7 +67,6 @@ void MX_RTC_Init(void)
   {
     Error_Handler();
   }
-*/
 
 }
 

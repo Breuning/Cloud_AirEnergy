@@ -232,7 +232,6 @@ void Delay_us(uint16_t us)                                     //ÀûÓÃTIM2ÊµÏÖusÑ
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)     //¶¨Ê±Æ÷ÖÐ¶Ï»Øµ÷º¯Êý
 {
-	static uint8_t Time_cnt = 0;
 
 	if(htim == &htim3) // TIM3¶¨Ê±1s½øÀ´Ò»´Î
 	{
@@ -264,36 +263,35 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)     //¶¨Ê±Æ÷ÖÐ¶Ï»Øµ÷
     {
 		static uint8_t T5Count_RS485 = 0;
 		static uint8_t T5Count_NBiot  = 0;
+		static uint8_t T5Count_McuReset  = 0;
 
 		T5Count_RS485++;
 		T5Count_NBiot++;
+		T5Count_McuReset++;
 
-		if(T5Count_RS485 >= 6)
+		if(T5Count_RS485 >= 24)
 		{
 			RS485DataReadTimerFlag = TRUE;
 			T5Count_RS485 = 0;
 		}
 
-		if(T5Count_NBiot >= 12)
+		if(T5Count_NBiot >= 36)
 		{
 			NBiotTaskTimerFlag = TRUE;
 			T5Count_NBiot = 0;
 		}
 
 
-    	Time_cnt++;
+		if(T5Count_McuReset >= 720)        //STM32¶¨Ê±ÖØÆô(720Îª1Ð¡Ê±)
+		{
+			NBiot_POWD_PEN();
+			HAL_Delay(200);
+			T5Count_McuReset = 0;
+		}
+
+
 //    	htim->Instance->CNT = 0;                               		  //Ã¿´ÎÖÐ¶Ï»Øµ÷º¯ÊýÖ´ÐÐºó½øÐÐ¼ÆÊýÆ÷ÇåÁã
     }
-
-//	¶¨Ê±ÖØÆô
-//	if(Time_cnt >= 12)
-//	{ //1Min
-//
-//		__disable_fault_irq();
-//		NVIC_SystemReset();
-//		Time_cnt = 0;
-//	}
-
 
 }
 /* USER CODE END 1 */

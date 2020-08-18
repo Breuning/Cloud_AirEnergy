@@ -38,14 +38,13 @@ void LED2_NETWORK_Registered(void)
 
 void LED2_NETWORK_DataTransfer(void)
 {
-	HAL_GPIO_WritePin(LED2_NETWORK_GPIO_Port, LED2_NETWORK_Pin, GPIO_PIN_RESET);
-	HAL_Delay(125);
-	HAL_GPIO_WritePin(LED2_NETWORK_GPIO_Port, LED2_NETWORK_Pin, GPIO_PIN_SET);
-	HAL_Delay(125);
-
-	HAL_GPIO_WritePin(LED2_NETWORK_GPIO_Port, LED2_NETWORK_Pin, GPIO_PIN_RESET);
-	HAL_Delay(125);
-	HAL_GPIO_WritePin(LED2_NETWORK_GPIO_Port, LED2_NETWORK_Pin, GPIO_PIN_SET);
-	HAL_Delay(125);
+	uint8_t i;
+	for(i = 0; i < 8; i++)
+	{
+		HAL_GPIO_TogglePin(LED2_NETWORK_GPIO_Port, LED2_NETWORK_Pin);
+		HAL_Delay(125);
+		HAL_GPIO_TogglePin(LED2_NETWORK_GPIO_Port, LED2_NETWORK_Pin);
+		HAL_Delay(125);
+	}
 }
 
