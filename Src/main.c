@@ -34,7 +34,7 @@
 #include "NBiotTask.h"
 #include "RS485Task.h"
 #include "Package.h"
-
+#include "ResetTask.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -136,6 +136,7 @@ int main(void)
 
 	RS485_Task();
 	NBiot_Task();
+	Reset_Task();
 
 	HAL_IWDG_Refresh(&hiwdg);     //喂狗，即重新加载计数值
   }

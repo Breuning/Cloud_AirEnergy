@@ -163,14 +163,61 @@ static void _addTimeToJson(cJSON *root, const char *name)
 		uint8_t hours_str  [2] = {NBUart_RX.RX_Buf[28], NBUart_RX.RX_Buf[29]};
 		uint8_t minutes_str[2] = {NBUart_RX.RX_Buf[31], NBUart_RX.RX_Buf[32]};
 		uint8_t seconds_str[2] = {NBUart_RX.RX_Buf[34], NBUart_RX.RX_Buf[35]};
-		int8_t zone_str    [3] = {NBUart_RX.RX_Buf[36], NBUart_RX.RX_Buf[37], NBUart_RX.RX_Buf[38]};
+//		int8_t zone_str    [3] = {NBUart_RX.RX_Buf[36], NBUart_RX.RX_Buf[37], NBUart_RX.RX_Buf[38]};
 
 		date.Year    = atoi((const char *)year_str);
 		date.Month   = atoi((const char *)month_str);
 		date.Date    = atoi((const char *)date_str);
-		time.Hours   = atoi((const char *)hours_str) + atoi((const char *)zone_str)/4;
+//		time.Hours   = atoi((const char *)hours_str) + atoi((const char *)zone_str)/4;
+		time.Hours   = atoi((const char *)hours_str) + 8;
 		time.Minutes = atoi((const char *)minutes_str);
 		time.Seconds = atoi((const char *)seconds_str);
+
+
+///***********************************************************
+		if(time.Hours > 23 && time.Hours < 32)                  // 24,25,26,27,28,29,30,31
+		{
+			time.Hours = time.Hours - 24;
+
+			if(date.Month == 1 || date.Month == 3 || date.Month == 5 || date.Month == 7 || date.Month == 8 || date.Month == 10 || date.Month == 12)
+			{
+				if(date.Date == 31)
+				{
+					date.Month = date.Month + 1;
+					date.Date = 1;
+				}
+				else
+				{
+					date.Date = date.Date + 1;
+				}
+			}
+			else if(date.Month == 4 || date.Month == 6 || date.Month == 9 || date.Month == 10)
+			{
+				if(date.Date == 30)
+				{
+					date.Month = date.Month + 1;
+					date.Date = 1;
+				}
+				else
+				{
+					date.Date = date.Date + 1;
+				}
+			}
+			else if(date.Month == 2)
+			{
+				if(date.Date == 28)
+				{
+					date.Month = date.Month + 1;
+					date.Date = 1;
+				}
+				else
+				{
+					date.Date = date.Date + 1;
+				}
+			}
+		}
+//*************************************************************/
+
 
 		NBUart_RX.receive_flag = 0;
 		memset(NBUart_RX.RX_Buf, 0 , sizeof(NBUart_RX.RX_Buf));

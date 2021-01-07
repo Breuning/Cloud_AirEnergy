@@ -217,6 +217,8 @@ void NBiot_QMTPUB()
 
 	uint8_t sub[] = {0x1A,0x1B};         //发送的数据包后面加CTRL+Z和ESC
 
+	PackageComposition();
+	strcat((char *)CloudPackage, (const char *)sub);
 
 	cmdAT_QMTPUB:
 	NBiot_ATSend(ATCmds[AT_QMTPUB]);
@@ -227,10 +229,6 @@ void NBiot_QMTPUB()
 			goto cmdAT_QMTPUB;
 		memset(NBUart_RX.RX_Buf, 0 , sizeof(NBUart_RX.RX_Buf));
 	}
-
-
-	PackageComposition();
-	strcat((char *)CloudPackage, (const char *)sub);
 
 	NBiot_ATSend((char *)CloudPackage);
 	HAL_Delay(1000);
